@@ -12,6 +12,8 @@ import {
   putInventory,
 } from "./controllers/inventory.js";
 
+import { postSales , getSales} from "./controllers/sales.js";
+
 const app = express();
 const port = process.env.PORT;
 
@@ -50,6 +52,10 @@ app.put(
   putInventory
 );
 app.delete("/inventories/:id", authenticateToken, authorizeRole(["admin"]));
+
+// Sale API`s
+app.get("/sales", authenticateToken, getSales);
+app.post('/sales' , authenticateToken , postSales)
 
 app.listen(port, () => {
   console.log(`Server is running on ${port}✈️`);
