@@ -2,33 +2,40 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { Bar } from "react-chartjs-2"
 import api from "../utils/api"
+import { getJwtToken } from "../utils/common"
+import toast, { Toaster } from "react-hot-toast";
+import Navbar from "./Navbar";
 
 const Reports: React.FC = () => {
   const [salesData, setSalesData] = useState<any[]>([])
   const [inventoryData, setInventoryData] = useState<any[]>([])
 
   useEffect(() => {
-    fetchSalesData()
-    fetchInventoryData()
-  }, [])
+    const fetchData = async () => {
+      const token = getJwtToken();
+      if (!token) {
+        toast.error("Authentication token not found!");
+        return;
+      }
 
-  const fetchSalesData = async () => {
-    try {
-      const response = await api.get("/sales")
-      setSalesData(response.data)
-    } catch (error) {
-      console.error("Error fetching sales data:", error)
-    }
-  }
+      try {
+        const inventoryResponse = await api.get("/inventories", {
+          headers: { Authorization: token },
+        });
+        setInventoryData(inventoryResponse.data);
 
-  const fetchInventoryData = async () => {
-    try {
-      const response = await api.get("/inventory")
-      setInventoryData(response.data)
-    } catch (error) {
-      console.error("Error fetching inventory data:", error)
-    }
-  }
+        const salesResponse = await api.get("/sales", {
+          headers: { Authorization: token },
+        });
+        setSalesData(salesResponse.data.sales);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error("Failed to fetch data. Please try again.");
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const monthlySalesData = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
@@ -74,6 +81,7 @@ const Reports: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <Navbar/>
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">Reports</h1>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -156,6 +164,7 @@ const Reports: React.FC = () => {
           </div>
         </div>
       </div>
+      <Toaster/>
     </div>
   )
 }

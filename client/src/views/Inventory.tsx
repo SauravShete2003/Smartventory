@@ -1,23 +1,36 @@
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import api from "../utils/api"
+import toast ,{Toaster} from "react-hot-toast";
+import { getCurrentuser, getJwtToken } from "../utils/common"
+import Navbar from "../components/Navbar";
 
 const Inventory: React.FC = () => {
   const [inventory, setInventory] = useState<any[]>([])
   const [newItem, setNewItem] = useState({ name: "", category: "", quantity: 0, price: 0, threshold: 0 })
 
   useEffect(() => {
-    fetchInventory()
-  }, [])
+    const fetchData = async () => {
+      const token = getJwtToken();
+      if (!token) {
+        toast.error("Authentication token not found!");
+        return;
+      }
 
-  const fetchInventory = async () => {
-    try {
-      const response = await api.get("/inventories")
-      setInventory(response.data)
-    } catch (error) {
-      console.error("Error fetching inventory:", error)
-    }
-  }
+      try {
+        const inventoryResponse = await api.get("/inventories", {
+          headers: { Authorization: token },
+        });
+        setInventory(inventoryResponse.data);
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error("Failed to fetch data. Please try again.");
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewItem({ ...newItem, [e.target.name]: e.target.value })
@@ -26,9 +39,14 @@ const Inventory: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await api.post("/inventory", newItem)
+      const token = getCurrentuser()
+      await api.post("/inventories", newItem ,  {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       setNewItem({ name: "", category: "", quantity: 0, price: 0, threshold: 0 })
-      fetchInventory()
+      
     } catch (error) {
       console.error("Error adding new item:", error)
     }
@@ -36,6 +54,7 @@ const Inventory: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <Navbar/>
       <h1 className="text-2xl font-semibold text-gray-900 mb-6">Inventory Management</h1>
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
@@ -180,6 +199,7 @@ const Inventory: React.FC = () => {
           </div>
         </div>
       </div>
+      <Toaster/>
     </div>
   )
 }

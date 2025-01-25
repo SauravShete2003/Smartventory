@@ -13,5 +13,6 @@ const getCurrentuser = (): any => {
     window.location.href = "/login";
   };
   
+
   export { getCurrentuser, getJwtToken, logOut };
   
