@@ -1,21 +1,34 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../utils/api";
-import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { getCurrentuser, getJwtToken } from "../utils/common";
 import toast, { Toaster } from "react-hot-toast";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
+ChartJS.register(
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const Dashboard: React.FC = () => {
   const { logout } = useAuth();
   const [user, setUser] = useState<any>(null);
   const [inventoryData, setInventoryData] = useState<any[]>([]);
-  // const [salesData, setSalesData] = useState<any[]>([]);
-  const inventoryChartRef = useRef<any>(null);
-  const salesChartRef = useRef<any>(null);
+  const [salesData, setSalesData] = useState<any[]>([]);
 
   useEffect(() => {
     const currentUser = getCurrentuser();
@@ -43,10 +56,10 @@ const Dashboard: React.FC = () => {
         });
         setInventoryData(inventoryResponse.data);
 
-        // const salesResponse = await api.get("/sales", {
-        //   headers: { Authorization: token },
-        // });
-        // setSalesData(salesResponse.data);
+        const salesResponse = await api.get("/sales", {
+          headers: { Authorization: token },
+        });
+        setSalesData(salesResponse.data.sales);
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error("Failed to fetch data. Please try again.");
@@ -56,7 +69,6 @@ const Dashboard: React.FC = () => {
     fetchData();
   }, []);
 
-  // Chart data
   const inventoryChartData = {
     labels: inventoryData.map((item) => item.name),
     datasets: [
@@ -68,28 +80,22 @@ const Dashboard: React.FC = () => {
     ],
   };
 
-  // const salesChartData = {
-  //   labels: salesData.map((sale) => new Date(sale.date).toLocaleDateString()),
-  //   datasets: [
-  //     {
-  //       label: "Sales",
-  //       data: salesData.map((sale) => sale.total),
-  //       backgroundColor: "rgba(54, 162, 235, 0.6)",
-  //     },
-  //   ],
-  // };
-
-  // Cleanup chart instances
-  useEffect(() => {
-    return () => {
-      if (inventoryChartRef.current) {
-        inventoryChartRef.current.destroy();
+  const salesChartData = Array.isArray(salesData)
+    ? {
+      labels: salesData
+      .filter((sale) => sale.saleDate)
+      .map((sale) => new Date(sale.saleDate).toLocaleDateString()),    
+      datasets: [
+        {
+          label: "Total Sales",
+          data: salesData
+            .filter((sale) => sale.saleDate)
+            .map((sale) => sale.total || 0),
+          backgroundColor: "rgba(153, 102, 255, 0.6)",
+        },
+      ],
       }
-      if (salesChartRef.current) {
-        salesChartRef.current.destroy();
-      }
-    };
-  }, []);
+    : { labels: [], datasets: [] };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -101,22 +107,36 @@ const Dashboard: React.FC = () => {
                 <span className="text-lg font-semibold">Smart Inventory</span>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <Link to="/" className="text-gray-900 px-3 py-2 text-sm font-medium">
+                <Link
+                  to="/"
+                  className="text-gray-900 px-3 py-2 text-sm font-medium"
+                >
                   Dashboard
                 </Link>
-                <Link to="/inventory" className="text-gray-500 px-3 py-2 text-sm font-medium">
+                <Link
+                  to="/inventory"
+                  className="text-gray-500 px-3 py-2 text-sm font-medium"
+                >
                   Inventory
                 </Link>
-                <Link to="/sales" className="text-gray-500 px-3 py-2 text-sm font-medium">
+                <Link
+                  to="/sales"
+                  className="text-gray-500 px-3 py-2 text-sm font-medium"
+                >
                   Sales
                 </Link>
-                <Link to="/reports" className="text-gray-500 px-3 py-2 text-sm font-medium">
+                <Link
+                  to="/reports"
+                  className="text-gray-500 px-3 py-2 text-sm font-medium"
+                >
                   Reports
                 </Link>
               </div>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:items-center">
-              <span className="text-sm text-gray-500 mr-4">Welcome, {user?.username || "Guest"}</span>
+              <span className="text-sm text-gray-500 mr-4">
+                Welcome, {user?.username || "Guest"}
+              </span>
               <button
                 onClick={logout}
                 className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium"
@@ -133,20 +153,29 @@ const Dashboard: React.FC = () => {
           <div className="bg-white shadow rounded-lg">
             <div className="p-5">
               <Bar
-                ref={inventoryChartRef}
                 data={inventoryChartData}
                 options={{ responsive: true, maintainAspectRatio: false }}
               />
             </div>
           </div>
           <div className="bg-white shadow rounded-lg">
-            {/* <div className="p-5">
+            <div className="p-5">
               <Bar
-                ref={salesChartRef}
                 data={salesChartData}
-                options={{ responsive: true, maintainAspectRatio: false }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: true, position: "top" },
+                    tooltip: { enabled: true },
+                  },
+                  scales: {
+                    x: { title: { display: true, text: "Date" } },
+                    y: { title: { display: true, text: "Total Sales" } },
+                  },
+                }}
               />
-            </div> */}
+            </div>
           </div>
         </div>
       </div>

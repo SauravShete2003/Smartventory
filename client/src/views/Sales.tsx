@@ -7,15 +7,12 @@ const Sales: React.FC = () => {
   const [newSale, setNewSale] = useState({ itemId: "", quantity: 0 });
   const [inventory, setInventory] = useState<any[]>([]);
 
-  useEffect(() => {
-    fetchSales();
-    fetchInventory();
-  }, []);
-
   const fetchSales = async () => {
     try {
       const response = await api.get("/sales");
       setSales(response.data);
+      console.log(response.data);
+      
     } catch (error) {
       console.error("Error fetching sales:", error);
     }
@@ -23,12 +20,17 @@ const Sales: React.FC = () => {
 
   const fetchInventory = async () => {
     try {
-      const response = await api.get("/inventory");
+      const response = await api.get("/inventories");
       setInventory(response.data);
     } catch (error) {
       console.error("Error fetching inventory:", error);
     }
   };
+
+  useEffect(() => {
+    fetchSales();
+    fetchInventory();
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>

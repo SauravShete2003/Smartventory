@@ -16,7 +16,10 @@ const Login: React.FC = () => {
     try {
       const response = await api.post("/login", { email, password });
       localStorage.setItem("smart-inventory-user-token", response.data.token);
-      localStorage.setItem("smart-inventory-user-details", JSON.stringify(response.data.data));
+      localStorage.setItem(
+        "smart-inventory-user-details",
+        JSON.stringify(response.data.data)
+      );
       login(response.data.token, response.data.user);
       navigate("/");
     } catch (err) {
@@ -36,7 +39,7 @@ const Login: React.FC = () => {
           <input type="hidden" name="remember" value="true" />
           <div className="rounded-md ">
             <div>
-              <label htmlFor="Email" className="sr-only">
+              <label htmlFor="email" className="sr-only">
                 Username
               </label>
               <input
@@ -46,6 +49,7 @@ const Login: React.FC = () => {
                 required
                 className=" relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm mb-4"
                 placeholder="Email"
+                autoComplete="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -61,16 +65,14 @@ const Login: React.FC = () => {
                 required
                 className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
+                autoComplete="current-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e)=> setPassword(e.target.value)}
               />
             </div>
             <p className="mt-2 text-center text-sm">
               Don't have an account?{" "}
-              <Link
-                to="/signup"
-                className="font-medium hover:text-blue-600"
-              >
+              <Link to="/signup" className="font-medium hover:text-blue-600">
                 Sign up
               </Link>
             </p>

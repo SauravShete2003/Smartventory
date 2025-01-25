@@ -46,6 +46,7 @@ const postSales = async (req, res) => {
 const getSales = async (req, res) => {
   try {
     const sales = await Sales.find().populate("item").exec();
+
     return res.status(200).json({ sales });
   } catch (error) {
     return res
