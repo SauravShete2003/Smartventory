@@ -19,15 +19,13 @@ const inventorySchema = new Schema({
     },
     image : {
         type : String,
-        required : true
         },
     threshold : {
         type : Number,
         required : true
     },
     description : {
-        type : String,
-        required : true
+        type : String
         }
 },{timestamps : true});
 

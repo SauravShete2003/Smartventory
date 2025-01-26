@@ -43,23 +43,36 @@ const Inventory: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     try {
       const token = getJwtToken();
-      console.log(token );
-      
+  
       if (!token) {
         toast.error("Authentication token not found!");
         return;
       }
-
-      const response = await api.post("/inventories", newItem, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+  
+      // Validate newItem fields before sending
+      if (!newItem.name || !newItem.category) {
+        toast.error("Name and category are required!");
+        return;
+      }
+  
+      const validatedNewItem = {
+        ...newItem,
+        quantity: newItem.quantity || 0, // Default to 0
+        price: newItem.price !== undefined ? newItem.price : 0, // Default to 0 if undefined
+        threshold: newItem.threshold || 0, // Default to 0
+      };
+  
+      const response = await api.post("/inventories", validatedNewItem, {
+        headers: { Authorization: token },
       });
-
-      setInventory([...inventory, response.data]);
+  
+      // Add the newly created item to the inventory list
+      setInventory([...inventory, response.data.item]);
+  
+      // Reset newItem form
       setNewItem({
         name: "",
         category: "",
@@ -69,7 +82,10 @@ const Inventory: React.FC = () => {
       });
     } catch (error) {
       console.error("Error adding new item:", error);
-    }};
+      toast.error("Failed to add new inventory item.");
+    }
+  };
+  
 
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">

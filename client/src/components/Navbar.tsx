@@ -70,7 +70,7 @@ function Navbar() {
 
             {/* User Info and Logout */}
             <div className="hidden sm:flex sm:items-center">
-              <span className="text-sm text-gray-500 mr-4">
+              <span className="block text-2xl font-bold text-gray-800 px-3 mr-4">
                 Welcome, {user?.username || "Guest"}
               </span>
               <button

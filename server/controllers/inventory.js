@@ -2,13 +2,23 @@ import Inventory from "../models/Inventory.js";
 
 const postInventory = async (req, res) => {
   try {
-    const inventory = new Inventory(req.body);
+    // Set default values for missing fields
+    const { name, category, quantity, price, threshold } = req.body;
+    const inventory = new Inventory({
+      name,
+      category,
+      quantity: quantity || 0, // Default to 0 if not provided
+      price: price !== undefined ? price : 0, // Default to 0 if price is undefined
+      threshold: threshold || 0, // Default to 0 if not provided
+    });
+
     await inventory.save();
-    res.status(201).json({ message: "Inventory created successfully" });
+    res.status(201).json({ message: "Inventory created successfully", item: inventory });
   } catch (err) {
     res.status(500).json({ message: "Error creating inventory", error: err });
   }
 };
+
 
 const getInventory = async (req, res) => {
   try {
