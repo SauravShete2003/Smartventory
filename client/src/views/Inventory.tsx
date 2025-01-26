@@ -1,13 +1,19 @@
-import type React from "react"
+import type React from "react";
 import { useState, useEffect } from "react";
-import api from "../utils/api"
-import toast ,{Toaster} from "react-hot-toast";
-import { getCurrentuser, getJwtToken } from "../utils/common"
+import api from "../utils/api";
+import toast, { Toaster } from "react-hot-toast";
+import { getJwtToken } from "../utils/common";
 import Navbar from "../components/Navbar";
 
 const Inventory: React.FC = () => {
-  const [inventory, setInventory] = useState<any[]>([])
-  const [newItem, setNewItem] = useState({ name: "", category: "", quantity: 0, price: 0, threshold: 0 })
+  const [inventory, setInventory] = useState<any[]>([]);
+  const [newItem, setNewItem] = useState({
+    name: "",
+    category: "",
+    quantity: 0,
+    price: 0,
+    threshold: 0,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,7 +28,6 @@ const Inventory: React.FC = () => {
           headers: { Authorization: token },
         });
         setInventory(inventoryResponse.data);
-
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error("Failed to fetch data. Please try again.");
@@ -33,33 +38,54 @@ const Inventory: React.FC = () => {
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewItem({ ...newItem, [e.target.name]: e.target.value })
-  }
+    setNewItem({ ...newItem, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
+
     try {
-      const token = getCurrentuser()
-      await api.post("/inventories", newItem ,  {
+      const token = getJwtToken();
+      console.log(token );
+      
+      if (!token) {
+        toast.error("Authentication token not found!");
+        return;
+      }
+
+      const response = await api.post("/inventories", newItem, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-      setNewItem({ name: "", category: "", quantity: 0, price: 0, threshold: 0 })
-      
+      });
+
+      setInventory([...inventory, response.data]);
+      setNewItem({
+        name: "",
+        category: "",
+        quantity: 0,
+        price: 0,
+        threshold: 0,
+      });
     } catch (error) {
-      console.error("Error adding new item:", error)
-    }
-  }
+      console.error("Error adding new item:", error);
+    }};
 
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <Navbar/>
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Inventory Management</h1>
+      <Navbar />
+      <h1 className="text-2xl font-semibold text-gray-900 mb-6">
+        Inventory Management
+      </h1>
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Add New Item</h3>
-          <form onSubmit={handleSubmit} className="mt-5 sm:flex sm:items-center">
+          <h3 className="text-lg leading-6 font-medium text-gray-900">
+            Add New Item
+          </h3>
+          <form
+            onSubmit={handleSubmit}
+            className="mt-5 sm:flex sm:items-center"
+          >
             <div className="w-full sm:max-w-xs">
               <label htmlFor="name" className="sr-only">
                 Name
@@ -186,11 +212,21 @@ const Inventory: React.FC = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {inventory.map((item) => (
                     <tr key={item._id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.category}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.quantity}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.price.toFixed(2)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.threshold}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {item.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {item.category}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {item.quantity}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${item.price.toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {item.threshold}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -199,10 +235,9 @@ const Inventory: React.FC = () => {
           </div>
         </div>
       </div>
-      <Toaster/>
+      <Toaster />
     </div>
-  )
-}
+  );
+};
 
-export default Inventory
-
+export default Inventory;

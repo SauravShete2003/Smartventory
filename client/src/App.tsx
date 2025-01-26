@@ -1,13 +1,13 @@
-import React from "react"
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
-import { AuthProvider } from "./contexts/AuthContext"
-import PrivateRoute from "./components/PrivateRoute"
-import Login from "./views/Login"
-import Dashboard from "./views/Dashboard"
-import Inventory from "./views/Inventory"
-import Sales from "./views/Sales"
-import Reports from "./components/Reports"
-import Signup from "./views/Signup"
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import PrivateRoute from "./components/PrivateRoute";
+import Login from "./views/Login";
+import Dashboard from "./views/Dashboard";
+import Inventory from "./views/Inventory";
+import Sales from "./views/Sales";
+import Reports from "./components/Reports";
+import Signup from "./views/Signup";
 
 const App: React.FC = () => {
   return (
@@ -16,19 +16,12 @@ const App: React.FC = () => {
         <div className="min-h-screen bg-gray-100">
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
             <Route
               path="/"
               element={
                 <PrivateRoute>
                   <Dashboard />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/signup"
-              element={
-                <PrivateRoute>
-                  <Signup />
                 </PrivateRoute>
               }
             />
@@ -60,7 +53,7 @@ const App: React.FC = () => {
         </div>
       </Router>
     </AuthProvider>
-  )
-}
+  );
+};
 
-export default App
+export default App;

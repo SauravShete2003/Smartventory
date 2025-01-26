@@ -1,1 +1,21 @@
 @import "tailwindcss";
+
+.input-box {
+    position: relative;
+    color: #ccc;
+    display: block;
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 0.27rem;
+}
+.input-box:focus , .input-box:active {
+    outline: none;
+    border: 1px solid rgb(55, 55, 237);
+}
+
+label {
+
+    display: block;
+    margin-bottom: 5px;
+}
