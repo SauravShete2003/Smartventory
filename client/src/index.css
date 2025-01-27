@@ -18,3 +18,16 @@ label {
     display: block;
     margin-bottom: 5px;
 }
+
+.sales-data-display{
+    padding-left: 1.5rem; /* px-6 */
+    padding-right: 1.5rem; /* px-6 */
+    padding-top: 0.75rem; /* py-3 */
+    padding-bottom: 0.75rem; /* py-3 */
+    text-align: left; /* text-left */
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 500; /* font-medium */
+    color: #6b7280; /* text-gray-500 */
+    text-transform: uppercase; /* uppercase */
+    letter-spacing: 0.05em; 
+}

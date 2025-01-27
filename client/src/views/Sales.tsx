@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../utils/api";
 import { getJwtToken } from "../utils/common";
-import toast , {Toaster} from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import Navbar from "../components/Navbar";
 
 const Sales: React.FC = () => {
@@ -17,16 +17,12 @@ const Sales: React.FC = () => {
   //     }
 
   //     const inventoryResponse = await api.get("/inventories", {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
+  //        headers: { Authorization: token },
   //     });
   //     setInventory(inventoryResponse.data);
 
   //     const salesResponse = await api.get("/sales", {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
+  //        headers: { Authorization: token },
   //     });
   //     setSales(salesResponse.data.sales);
 
@@ -37,6 +33,7 @@ const Sales: React.FC = () => {
   //     );
   //   }
   // };
+
   useEffect(() => {
     const fetchData = async () => {
       const token = getJwtToken();
@@ -77,9 +74,7 @@ const Sales: React.FC = () => {
       if (!token) throw new Error("Authentication token is missing!");
 
       await api.post("/sales", newSale, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: token },
       });
 
       setNewSale({ itemId: "", quantity: 0 });
@@ -88,23 +83,32 @@ const Sales: React.FC = () => {
     } catch (error: any) {
       console.error("Error adding new sale:", error);
       toast.error(
-        error.response?.data?.message || "Failed to record sale. Please try again."
+        error.response?.data?.message ||
+          "Failed to record sale. Please try again."
       );
     }
   };
 
-
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <Navbar />
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Sales Management</h1>
+      <h1 className="text-2xl font-semibold text-gray-900 mb-6">
+        Sales Management
+      </h1>
 
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Record New Sale</h3>
-          <form onSubmit={handleSubmit} className="mt-5 sm:flex sm:items-center">
+          <h3 className="text-lg leading-6 font-medium text-gray-900">
+            Record New Sale
+          </h3>
+          <form
+            onSubmit={handleSubmit}
+            className="mt-5 sm:flex sm:items-center"
+          >
             <div className="w-full sm:max-w-xs">
-              <label htmlFor="itemId" className="sr-only">Item</label>
+              <label htmlFor="itemId" className="sr-only">
+                Item
+              </label>
               <select
                 id="itemId"
                 name="itemId"
@@ -122,7 +126,9 @@ const Sales: React.FC = () => {
               </select>
             </div>
             <div className="w-full sm:max-w-xs mt-3 sm:mt-0 sm:ml-3">
-              <label htmlFor="quantity" className="sr-only">Quantity</label>
+              <label htmlFor="quantity" className="sr-only">
+                Quantity
+              </label>
               <input
                 type="number"
                 name="quantity"
@@ -152,17 +158,25 @@ const Sales: React.FC = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                    <th className="sales-data-display">
+                      Date
+                    </th>
+                    <th className="sales-data-display">
+                      Item
+                    </th>
+                    <th className="sales-data-display">
+                      Quantity
+                    </th>
+                    <th className="sales-data-display">
+                      Total
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {sales.map((sale) => (
                     <tr key={sale._id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(sale.date).toLocaleDateString()}
+                        {new Date(sale.saleDate).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {sale.item.name}
@@ -171,8 +185,11 @@ const Sales: React.FC = () => {
                         {sale.quantity}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${sale.total.toFixed(2)}
+                        ₹{sale.total.toFixed(2)}
                       </td>
+                      {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {sale.customer.name} ({sale.customer.email})
+                      </td> */}
                     </tr>
                   ))}
                 </tbody>
@@ -181,7 +198,7 @@ const Sales: React.FC = () => {
           </div>
         </div>
       </div>
-      <Toaster/>
+      <Toaster />
     </div>
   );
 };

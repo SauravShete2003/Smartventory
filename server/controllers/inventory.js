@@ -2,14 +2,13 @@ import Inventory from "../models/Inventory.js";
 
 const postInventory = async (req, res) => {
   try {
-    // Set default values for missing fields
     const { name, category, quantity, price, threshold } = req.body;
     const inventory = new Inventory({
       name,
       category,
-      quantity: quantity || 0, // Default to 0 if not provided
-      price: price !== undefined ? price : 0, // Default to 0 if price is undefined
-      threshold: threshold || 0, // Default to 0 if not provided
+      quantity: quantity || 0,
+      price: price !== undefined ? price : 0, 
+      threshold: threshold || 0, 
     });
 
     await inventory.save();

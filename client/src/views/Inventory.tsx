@@ -51,8 +51,7 @@ const Inventory: React.FC = () => {
         toast.error("Authentication token not found!");
         return;
       }
-  
-      // Validate newItem fields before sending
+
       if (!newItem.name || !newItem.category) {
         toast.error("Name and category are required!");
         return;
@@ -60,19 +59,17 @@ const Inventory: React.FC = () => {
   
       const validatedNewItem = {
         ...newItem,
-        quantity: newItem.quantity || 0, // Default to 0
-        price: newItem.price !== undefined ? newItem.price : 0, // Default to 0 if undefined
-        threshold: newItem.threshold || 0, // Default to 0
+        quantity: newItem.quantity || 0, 
+        price: newItem.price !== undefined ? newItem.price : 0, 
+        threshold: newItem.threshold || 0,
       };
   
       const response = await api.post("/inventories", validatedNewItem, {
         headers: { Authorization: token },
       });
   
-      // Add the newly created item to the inventory list
       setInventory([...inventory, response.data.item]);
   
-      // Reset newItem form
       setNewItem({
         name: "",
         category: "",
@@ -238,7 +235,7 @@ const Inventory: React.FC = () => {
                         {item.quantity}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${item.price.toFixed(2)}
+                      ₹{item.price.toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {item.threshold}

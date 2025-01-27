@@ -29,12 +29,16 @@ const postSales = async (req, res) => {
 
     const savedSale = await sale.save();
 
+    // Update the stock for the item
     item.stock -= quantity;
     await item.save();
 
+    // Populate item and return sale details
+    const populatedSale = await Sales.findById(savedSale._id).populate("item", "name price");
+
     return res
       .status(201)
-      .json({ message: "Sale created successfully", sale: savedSale });
+      .json({ message: "Sale created successfully", sale: populatedSale });
   } catch (error) {
     console.error("Error:", error.message);
     return res
@@ -42,7 +46,6 @@ const postSales = async (req, res) => {
       .json({ message: "Error creating sale", error: error.message });
   }
 };
-
 const getSales = async (req, res) => {
   try {
     const sales = await Sales.find().populate("item").exec();
