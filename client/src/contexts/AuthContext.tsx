@@ -1,36 +1,41 @@
-import React, { createContext, useContext, useState } from "react"
+import React, { createContext, useContext, useState } from "react";
 
-interface AuthContextType {
-  currentUser: any | null 
-  login: (email: string, password: string) => Promise<void>
-  logout: () => Promise<void>
+interface User {
+  email: string;
+  password: string;
+  role: string;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+interface AuthContextType {
+  currentUser: User | null;
+  login: (email: string, password: string, role: string) => Promise<void>;
+  logout: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<any | null>(null)
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  const login = async (email: string, password: string) => {
-
-    setCurrentUser({ email , password}) 
-  }
+  const login = async (email: string, password: string, role: string) => {
+    setCurrentUser({ email, password, role });
+  };
 
   const logout = async () => {
-    setCurrentUser(null)
-  }
+    setCurrentUser(null);
+  };
 
   return (
     <AuthContext.Provider value={{ currentUser, login, logout }}>
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
-export const useAuth = () => {
-  const context = useContext(AuthContext)
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context
-}
+  return context;
+};

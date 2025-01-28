@@ -1,69 +1,82 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import api from "../utils/api";
 import { getJwtToken } from "../utils/common";
 import toast, { Toaster } from "react-hot-toast";
 import Navbar from "../components/Navbar";
 
+// Type definitions
+interface InventoryItem {
+  _id: string;
+  name: string;
+}
+
+interface Sale {
+  _id: string;
+  saleDate: string;
+  item: { name: string };
+  quantity: number;
+  total: number;
+}
+
+interface NewSale {
+  itemId: string;
+  quantity: number;
+}
+
 const Sales: React.FC = () => {
-  const [sales, setSales] = useState<any[]>([]);
-  const [newSale, setNewSale] = useState({
+  const [sales, setSales] = useState<Sale[]>([]);
+  const [newSale, setNewSale] = useState<NewSale>({
     itemId: "",
     quantity: 0,
-    phone: "",
-    email: "",
-    customer: { name: "" },
   });
-  const [inventory, setInventory] = useState<any[]>([]);
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+
+  // Reusable function for API fetching
+  const fetchData = async () => {
+    const token = getJwtToken();
+    if (!token) {
+      toast.error("Authentication token not found!");
+      return;
+    }
+
+    try {
+      // Fetch inventory
+      const inventoryResponse = await api.get<InventoryItem[]>("/inventories", {
+        headers: { Authorization: token },
+      });
+      setInventory(inventoryResponse.data);
+
+      // Fetch sales
+      const salesResponse = await api.get<{ sales: Sale[] }>("/sales", {
+        headers: { Authorization: token },
+      });
+      setSales(salesResponse.data.sales);
+    } catch (error: any) {
+      console.error("Error fetching data:", error);
+      toast.error(error.response?.data?.message || "Failed to fetch data.");
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const token = getJwtToken();
-      if (!token) {
-        toast.error("Authentication token not found!");
-        return;
-      }
-
-      try {
-        const inventoryResponse = await api.get("/inventories", {
-          headers: { Authorization: token },
-        });
-        setInventory(inventoryResponse.data);
-
-        const salesResponse = await api.get("/sales", {
-          headers: { Authorization: token },
-        });
-        setSales(salesResponse.data.sales);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to fetch data. Please try again.");
-      }
-    };
-
     fetchData();
   }, []);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
+    e: ChangeEvent<HTMLSelectElement | HTMLInputElement>
   ) => {
     const { name, value } = e.target;
-
-    // Handle nested object updates for customer name
-    if (name === "customer.name") {
-      setNewSale({
-        ...newSale,
-        customer: { ...newSale.customer, name: value },
-      });
-    } else {
-      setNewSale({ ...newSale, [name]: value });
-    }
+    setNewSale({ ...newSale, [name]: name === "quantity" ? parseInt(value, 10) || 0 : value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    try {
-      const token = getJwtToken();
-      if (!token) throw new Error("Authentication token is missing!");
+    const token = getJwtToken();
+    if (!token) {
+      toast.error("Authentication token is missing!");
+      return;
+    }
 
+    try {
       await api.post("/sales", newSale, {
         headers: { Authorization: token },
       });
@@ -71,18 +84,13 @@ const Sales: React.FC = () => {
       setNewSale({
         itemId: "",
         quantity: 0,
-        phone: "",
-        email: "",
-        customer: { name: "" },
       });
       toast.success("Sale recorded successfully!");
-      // Optionally refresh data after submission
-      // fetchData();
+      fetchData(); // Refresh data after successful submission
     } catch (error: any) {
       console.error("Error adding new sale:", error);
       toast.error(
-        error.response?.data?.message ||
-          "Failed to record sale. Please try again."
+        error.response?.data?.message || "Failed to record sale. Please try again."
       );
     }
   };
@@ -140,57 +148,6 @@ const Sales: React.FC = () => {
               />
             </div>
 
-            {/* Customer Name */}
-            <div>
-              <label htmlFor="customerName" className="block text-sm font-medium text-gray-700">
-                Customer Name
-              </label>
-              <input
-                type="text"
-                name="customer.name"
-                id="customerName"
-                className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                placeholder="Customer Name"
-                value={newSale.customer.name}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            {/* Customer Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Customer Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                placeholder="Customer Email"
-                value={newSale.email}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            {/* Customer Phone */}
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                Customer Phone
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                id="phone"
-                className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                placeholder="Customer Phone"
-                value={newSale.phone}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
             {/* Submit Button */}
             <div>
               <button
@@ -227,22 +184,30 @@ const Sales: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {sales.map((sale) => (
-                    <tr key={sale._id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(sale.saleDate).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {sale.item.name}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {sale.quantity}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ₹{sale.total.toFixed(2)}
+                  {sales.length > 0 ? (
+                    sales.map((sale) => (
+                      <tr key={sale._id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Date(sale.saleDate).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {sale.item.name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {sale.quantity}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          ₹{sale.total.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                        No sales data available.
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>

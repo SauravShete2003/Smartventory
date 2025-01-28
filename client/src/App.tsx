@@ -37,7 +37,7 @@ const App: React.FC = () => {
               path="/sales"
               element={
                 <PrivateRoute>
-                  <Sales />
+                  <Sales  />
                 </PrivateRoute>
               }
             />

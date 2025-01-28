@@ -5,6 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { getJwtToken } from "../utils/common";
 import Navbar from "../components/Navbar";
 
+
 const Inventory: React.FC = () => {
   const [inventory, setInventory] = useState<any[]>([]);
   const [newItem, setNewItem] = useState({

@@ -14,7 +14,7 @@ const salesSchema = new Schema(
     },
     pricePerUnit: {
       type: Number,
-      required: true,
+      // required: true,
       min: [0, "Price per unit must be at least 0"],
     },
     total: {
@@ -23,7 +23,7 @@ const salesSchema = new Schema(
     customer: {
       name: {
         type: String,
-        required: true,
+        // required: true,
         trim: true,
       },
       email: {

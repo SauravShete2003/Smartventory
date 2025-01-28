@@ -48,6 +48,14 @@ function Navbar() {
               >
                 <Home className="w-5 h-5 mr-1" /> Dashboard
               </Link>
+              {user && (user.role === "admin" || user.role === "manager") &&
+               (                    <Link
+                to="/inventory"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+              >
+                Inventory
+              </Link>
+            )}
               <Link
                 to="/inventory"
                 className="flex items-center text-gray-500 px-3 py-2 text-sm font-medium hover:text-indigo-600"
@@ -60,12 +68,12 @@ function Navbar() {
               >
                 <ShoppingCart className="w-5 h-5 mr-1" /> Sales
               </Link>
-              <Link
+              {user && user.role === "admin" && ( <Link
                 to="/reports"
                 className="flex items-center text-gray-500 px-3 py-2 text-sm font-medium hover:text-indigo-600"
               >
                 <BarChart className="w-5 h-5 mr-1" /> Reports
-              </Link>
+              </Link>)}
             </div>
 
             {/* User Info and Logout */}
