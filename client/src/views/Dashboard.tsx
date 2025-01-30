@@ -13,7 +13,7 @@ import { Bar } from "react-chartjs-2";
 import { getJwtToken } from "../utils/common";
 import toast, { Toaster } from "react-hot-toast";
 import Navbar from "../components/Navbar";
-
+import Sidebar from "../components/Sidebar";
 ChartJS.register(
   BarElement,
   CategoryScale,
@@ -67,57 +67,63 @@ const Dashboard: React.FC = () => {
 
   const salesChartData = Array.isArray(salesData)
     ? {
-      labels: salesData
-      .filter((sale) => sale.saleDate)
-      .map((sale) => new Date(sale.saleDate).toLocaleDateString()),    
-      datasets: [
-        {
-          label: "Total Sales",
-          data: salesData
-            .filter((sale) => sale.saleDate)
-            .map((sale) => sale.total || 0),
-          backgroundColor: "rgba(153, 102, 255, 0.6)",
-        },
-      ],
+        labels: salesData
+          .filter((sale) => sale.saleDate)
+          .map((sale) => new Date(sale.saleDate).toLocaleDateString()),
+        datasets: [
+          {
+            label: "Total Sales",
+            data: salesData
+              .filter((sale) => sale.saleDate)
+              .map((sale) => sale.total || 0),
+            backgroundColor: "rgba(153, 102, 255, 0.6)",
+          },
+        ],
       }
     : { labels: [], datasets: [] };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar/>
+    <div className="flex">
+      <Sidebar />
+      <div className="flex-1">
+        <Navbar />
+        <div className="p-6">
+          <h1 className="text-2xl font-bold text-center">Dashboard</h1>
 
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <div className="bg-white shadow rounded-lg">
-            <div className="p-5">
-              <Bar
-                data={inventoryChartData}
-                options={{ responsive: true, maintainAspectRatio: false }}
-              />
+          <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 ">
+              <div className="bg-white shadow rounded-lg">
+                <div className="p-5">
+                  <Bar
+                    data={inventoryChartData}
+                    options={{ responsive: true, maintainAspectRatio: false }}
+                  />
+                </div>
+              </div>
+              <div className="bg-white shadow rounded-lg">
+                <div className="p-5">
+                  <Bar
+                    data={salesChartData}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: { display: true, position: "top" },
+                        tooltip: { enabled: true },
+                      },
+                      scales: {
+                        x: { title: { display: true, text: "Date" } },
+                        y: { title: { display: true, text: "Total Sales" } },
+                      },
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
-          <div className="bg-white shadow rounded-lg">
-            <div className="p-5">
-              <Bar
-                data={salesChartData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: { display: true, position: "top" },
-                    tooltip: { enabled: true },
-                  },
-                  scales: {
-                    x: { title: { display: true, text: "Date" } },
-                    y: { title: { display: true, text: "Total Sales" } },
-                  },
-                }}
-              />
-            </div>
-          </div>
+          <Toaster />
         </div>
       </div>
-      <Toaster />
     </div>
   );
 };

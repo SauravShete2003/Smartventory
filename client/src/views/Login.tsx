@@ -20,7 +20,7 @@ const Login: React.FC = () => {
         "smart-inventory-user-details",
         JSON.stringify(response.data.data)
       );
-      login(response.data.token, response.data.user);
+      login(response.data.token, response.data.user, response.data.role);
       navigate("/");
     } catch (err) {
       setError("Invalid credentials");
