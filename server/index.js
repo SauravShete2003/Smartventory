@@ -18,7 +18,16 @@ const app = express();
 const port = process.env.PORT;
 
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+import cors from "cors";  // Import cors
+
+const corsOptions = {
+  origin: "https://smart-inventory-ysnz.onrender.com" || "localhost://5173",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+};
+
+app.use(cors(corsOptions)); // Use CORS middleware
+
 // app.use(cors());
 // app.use((req, res, next) => {
 //   res.header('Access-Control-Allow-Origin', '*'); // or specify origin
