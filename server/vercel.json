@@ -1,0 +1,14 @@
+{
+    "headers": [
+      {
+        "source": "/dist/(.*)\\.css",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "text/css"
+          }
+        ]
+      }
+    ]
+  }
+  
