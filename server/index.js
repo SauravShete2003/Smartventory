@@ -13,12 +13,8 @@ import { postSales, getSales } from "./controllers/sales.js";
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(express.json());
-
-// Serve static files from dist
 app.use(express.static(path.join(process.cwd(), 'dist')));
 
-// Fix CORS issues
 app.use(cors({
     origin: 'https://smart-inventory-ysnz.onrender.com',
     methods: 'GET, POST, PUT, DELETE',
@@ -26,7 +22,6 @@ app.use(cors({
     credentials: true
 }));
 
-// Connect to MongoDB
 const mongoDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URL, {
