@@ -3,7 +3,7 @@ import cors from "cors";
 import { configDotenv } from "dotenv";
 configDotenv();
 import mongoose from "mongoose";
-// import path from "path";
+import path from "path";
 
 import { postLogin, postSignup } from "./controllers/user.js";
 import { authenticateToken, authorizeRole } from "./middleware/auth.js";
