@@ -4,6 +4,7 @@ import { configDotenv } from "dotenv";
 configDotenv();
 import mongoose from "mongoose";
 import path from "path";
+import { fileURLToPath } from 'url';
 
 import { postLogin, postSignup } from "./controllers/user.js";
 import { authenticateToken, authorizeRole } from "./middleware/auth.js";
@@ -13,8 +14,10 @@ import { postSales, getSales } from "./controllers/sales.js";
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(express.json());
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'dist')));
 
 app.use(cors({
