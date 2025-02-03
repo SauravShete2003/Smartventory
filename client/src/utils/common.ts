@@ -9,7 +9,8 @@ const getCurrentuser = (): any => {
   };
   
   const logOut = (): void => {
-    localStorage.clear();
+    localStorage.removeItem("smart-inventory-user-details");
+    localStorage.removeItem("smart-inventory-user-token");
     window.location.href = "/login";
   };
   

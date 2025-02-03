@@ -3,7 +3,7 @@ import cors from "cors";
 import { configDotenv } from "dotenv";
 configDotenv();
 import mongoose from "mongoose";
-import path from "path";
+// import path from "path";
 
 import { postLogin, postSignup } from "./controllers/user.js";
 import { authenticateToken, authorizeRole } from "./middleware/auth.js";
@@ -15,10 +15,12 @@ const port = process.env.PORT || 5000;
 
 app.use(express.json());
 
+app.use(express.static('public'));
 
-app.use(express());
-
-app.use(cors());
+app.use(cors({
+    origin: '*'
+  }));
+  
 
 const mongoDB = async () => {
     try {
