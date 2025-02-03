@@ -14,7 +14,11 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await api.post("/login", { email, password });
+      const response = await api.post("/login", { email, password } , {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+        },);
       localStorage.setItem("smart-inventory-user-token", response.data.token);
       localStorage.setItem(
         "smart-inventory-user-details",
