@@ -1,33 +1,40 @@
-import type React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../utils/api";
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(""); // Clear previous errors
+
     try {
-      const response = await api.post("/login", { email, password } , {
+      const response = await api.post("/login", { email, password }, {
         headers: {
-            'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         }
-        },);
-      localStorage.setItem("smart-inventory-user-token", response.data.token);
-      localStorage.setItem(
-        "smart-inventory-user-details",
-        JSON.stringify(response.data.data)
-      );
-      login(response.data.token, response.data.user, response.data.role);
-      navigate("/");
-    } catch (err) {
-      setError("Invalid credentials");
+      });
+
+      if (response.data.token) {
+        localStorage.setItem("smart-inventory-user-token", response.data.token);
+        localStorage.setItem(
+          "smart-inventory-user-details",
+          JSON.stringify(response.data.data)
+        );
+
+        login(response.data.token, response.data.user, response.data.role);
+        navigate("/");
+      } else {
+        setError("Invalid credentials. Please try again.");
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Invalid credentials");
     }
   };
 
@@ -44,16 +51,16 @@ const Login: React.FC = () => {
           <div className="rounded-md ">
             <div>
               <label htmlFor="email" className="sr-only">
-                Username
+                Email
               </label>
               <input
                 id="email"
                 name="email"
-                type="text"
+                type="email"
                 required
-                className=" relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm mb-4"
+                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm mb-4"
                 placeholder="Email"
-                autoComplete="Email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -71,7 +78,7 @@ const Login: React.FC = () => {
                 placeholder="Password"
                 autoComplete="current-password"
                 value={password}
-                onChange={(e)=> setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <p className="mt-2 text-center text-sm">
